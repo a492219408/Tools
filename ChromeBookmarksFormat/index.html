@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title> JS 压缩/解压工具</title>
+    <meta name='robots' content='max-image-preview:large' />
+<!--    <link rel='stylesheet' id='wpProQuiz_front_style-css' href='https://c.runoob.com/wp-content/plugins/Wp-Pro-Quiz/css/wpProQuiz_front.min.css?ver=0.37' type='text/css' media='all' />-->
+    <link rel="stylesheet" id='wpProQuiz_front_style-css' href="css/wpProQuiz_front.min.css">
+    <!--    <link rel="canonical" href="https://c.runoob.com/front-end/51/" />-->
+    <meta name="keywords" content="JS 压缩/解压工具">
+    <meta name="description" content="JS 压缩/解压工具可以实现 JS 代码在线压缩、解压，也可以格式化 JS 代码。..">
+<!--    <link rel="shortcut icon" href="https://static.runoob.com/images/c-runoob-logo.ico">-->
+    <link rel="shortcut icon" href="images/c-runoob-logo.ico">
+<!--    <script src="//cdn.staticfile.org/codemirror/5.48.2/codemirror.min.js"></script>-->
+    <script src="js/codemirror.min.js"></script>
+<!--    <script src="https://cdn.staticfile.org/codemirror/5.48.2/addon/mode/simple.min.js"></script>-->
+    <script src="js/simple.min.js"></script>
+<!--    <link rel="stylesheet" href="//cdn.staticfile.org/codemirror/5.48.2/codemirror.min.css">-->
+    <link rel="stylesheet" href="css/codemirror.min.css">
+
+
+<!--    <script src="//cdn.staticfile.org/codemirror/5.48.2/mode/javascript/javascript.js"></script>-->
+    <script src="js/javascript.js"></script>
+<!--    <script src="https://c.runoob.com/wp-content/themes/toolrunoob2/assets/js/format.js"></script>-->
+    <script src="js/format.js"></script>
+
+
+    <!-- Bootstrap Core CSS -->
+<!--    <link rel="stylesheet" href="https://c.runoob.com/wp-content/themes/toolrunoob2/bootstrap.min.css">-->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Custom Fonts -->
+<!--        <link href="https://cdn.staticfile.org/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" type="text/css">-->
+        <link href="css/all.min.css" rel="stylesheet" type="text/css">
+    <!--[if lt IE 9]-->
+    <!--    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>-->
+    <script src="js/html5.min.js"></script>
+    <!--    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>-->
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    <!-- PHP 代码 -->
+    <!--        <link rel="stylesheet" href="https://c.runoob.com/wp-content/themes/toolrunoob2/style.css?version=1.309">-->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!--    <script src="https://cdn.staticfile.org/jquery/2.2.4/jquery.min.js"></script>-->
+    <script src="js/jquery.min.js"></script>
+    <!--    <script src="https://cdn.staticfile.org/clipboard.js/2.0.4/clipboard.min.js"></script>-->
+    <script src="js/clipboard.min.js"></script>
+
+
+</head>
+
+<body>
+
+<script>
+    var is_home = false;
+</script>
+<style>
+    .runoob-page-content {
+        margin: 0 20px;
+    }
+</style>
+<div class="runoob-page-content">
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div id="compiler" class="card-header">
+
+                    <form class="form-inline" role="form" onSubmit="return false;">
+                        <div class="col-md-8">
+                            <button type="button" class="btn btn-outline-primary mr-sm-1" id="submitBTN"><i class="fa fa-compress"></i> 压缩</button>
+                            <button type="button" class="btn btn-outline-info mr-sm-1" id="submitBTN2"><i class="fa fa-expand"></i> 解压/格式化</button>
+                            <button type="button" class="btn btn-warning  mr-sm-1" id="copycode"><i class="fa fa-copy"></i> 复制代码</button>
+                            <button class="btn  btn-danger  mr-sm-1" type="button " onclick="clearAll()"><strong><i class="fas fa-eraser"></i> 清空</strong></button>
+                            <select class="custom-select" id="tabsize">
+                                <option value="1">一个 tab 缩进</option>
+                                <option value="2">2 个空格缩进</option>
+                                <option value="3">3 个空格缩进</option>
+                                <option value="4" selected="selected">4 个空格缩进</option>
+                                <option value="8">8 个空格缩进</option>
+                            </select>
+                            <button type="button" class="btn btn-warning  mr-sm-1" id="copyBookmarkCode"><i class="fa fa-copy"></i> 生成书签JS到剪切板</button>
+                            <input type="file" class="btn" onchange="changeToFileContent(this)">
+
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-inline float-right"><strong style="font-size: 16px"><i class="fa fa-cogs"></i> JS 压缩/解压工具</strong></label>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="card-body">
+                    <div class="col-md-12" id="warning" style="display: none;">
+                        <div class="alert alert-warning">
+                            <a href="#" class="close" data-dismiss="alert">
+                                &times;
+                            </a>
+                            <p><strong>警告！</strong>JSON 格式错误。</p>
+                            <p id="warning-info"></p>
+                        </div>
+                    </div>
+                    <form role="form" id="compiler-form">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                    <textarea class="form-control"  id="code" name="code" rows="10">function hello() {
+    console.log('Hello World!');
+}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <textarea placeholder="运行结果……" class="form-control" id="compiler-textarea-result" rows="10"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <style type="text/css">
+        .CodeMirror{
+            height: 500px;
+        }
+
+    </style>
+<!--    <script type="text/javascript" src="//static.runoob.com/assets/js/jquery.format.js?v=0.11"></script>-->
+    <script type="text/javascript" src="js/jquery.format.js?v=0.11"></script>
+<!--    <script type="text/javascript" src="//static.runoob.com/assets/js/ObjTree.min.js"></script>-->
+    <script type="text/javascript" src="js/ObjTree.min.js"></script>
+<!--    <script src="/wp-content/themes/toolrunoob2/assets/js/beautify.min.js"></script>-->
+    <script src="js/beautify.min.js"></script>
+    <script>
+        var editor1 = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "text/javascript",
+            indentUnit: 4,
+            indentWithTabs: true,
+        });
+        var editor2 = CodeMirror.fromTextArea(document.getElementById("compiler-textarea-result"), {
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            mode: "text/javascript",
+            indentUnit: 4,
+            indentWithTabs: true,
+        });
+
+        $("#submitBTN").click(function() {
+
+
+            loadingdata = '程序正在运行中……';
+            $("#compiler-textarea-result").val(loadingdata);
+
+            code = editor1.getValue();
+            var packer = new Packer;
+            var output = packer.pack(code, 0, 0);
+            editor2.getDoc().setValue(output);
+        });
+
+        $("#submitBTN2").click(function() {
+            loadingdata = '程序正在运行中……';
+            $("#compiler-textarea-result").val(loadingdata);
+
+            code = editor1.getValue();
+            _indent_size = $('#tabsize').val();
+            _indent_char  = parseInt(_indent_size, 10) === 1 ? '\t' : ' ';
+            if(code) {
+
+
+                var result = js_beautify(code,{ indent_size: _indent_size, indent_char: _indent_char, space_in_empty_paren: true });
+                editor2.getDoc().setValue(result);
+            }
+        });
+
+        $('#tabsize').on('change', function() {
+            $("#submitBTN2").click();
+        });
+        $("#submitBTN3").click(function() {
+            var content = editor1.getValue();
+
+            if (content.trim().length == 0) {
+                return false;
+            }
+
+            try {
+                var jsonStr = editor1.getValue();
+                var json = JSON.parse(jsonStr);
+                $("#warning").html("<div class=\"alert alert-success\">JSON 数据合法</div>").show().delay(5000).fadeOut();
+            } catch (e) {
+                $("#warning").html("<div class=\"alert alert-danger\">JSON 数据错误："+e+"</div>").show().delay(5000).fadeOut();
+            }
+
+        });
+
+
+        function jsonToxml() {
+
+            var content = editor1.getValue();
+
+            if (content.trim().length == 0) {
+                return false;
+            }
+
+
+            try {
+                var jsonStr = editor1.getValue();
+                var json = JSON.parse(jsonStr);
+                var xotree = new XML.ObjTree();
+                var xml = xotree.writeXML(json);
+                xml = decodeSpecialCharacter(xml);
+
+                editor2.setOption("mode", 'application/xml');
+                formatXML =  $.format(xml, {method: 'xml'});
+                editor2.getDoc().setValue(formatXML);
+            } catch (e) {
+                $("#warning").html("<div class=\"alert alert-danger\">JSON 数据错误："+e+"</div>").show().delay(5000).fadeOut();
+            }
+        }
+        function decodeSpecialCharacter(str) {
+            return str.replace(/\&amp;/g, '&').replace(/\&gt;/g, '>').replace(/\&lt;/g,
+                '<').replace(/\&quot;/g, '"');
+        }
+
+        function jsonTocsv() {
+
+            var content = editor1.getValue();
+
+            if (content.trim().length == 0) {
+                return false;
+            }
+
+            try {
+                var jsonStr = editor1.getValue();
+                var json = JSON.parse(jsonStr);
+                var csv = jsonTocsvbyjson(json);
+
+                editor2.setOption("mode", 'text/x-q');
+                editor2.getDoc().setValue(csv);
+
+
+            } catch (e) {
+                $("#warning").html("<div class=\"alert alert-danger\">JSON 数据错误："+e+"</div>").show().delay(5000).fadeOut();
+            }
+        }
+        function jsonTocsvbyjson(data) {
+
+            arr = [];
+            flag = true;
+
+            var header = "";
+            var content = "";
+            var headFlag = true;
+
+            try {
+
+                var type1 = typeof data;
+
+                if (type1 != "object") {
+                    data = processJSON($.parseJSON(data));
+                } else {
+                    data = processJSON(data);
+                }
+
+            } catch (e) {
+                setMessage("error", "Error in Convert : add proper input format");
+                return false;
+            }
+
+            $.each(data, function(k, value) {
+                if (k % 2 == 0) {
+                    if (headFlag) {
+                        if (value != "end") {
+                            header += value + ",";
+                        } else {
+                            // remove last colon from string
+                            header = header.substring(0, header.length - 1);
+                            headFlag = false;
+                        }
+                    }
+                } else {
+                    if (value != "end") {
+                        var temp = data[k - 1];
+                        if (header.search(temp) != -1) {
+                            content += value + ",";
+                        }
+                    } else {
+                        // remove last colon from string
+                        content = content.substring(0, content.length - 1);
+                        content += "\n";
+                    }
+                }
+
+            });
+
+            return (header + "\n" + content);
+        }
+        function processJSON(data) {
+
+            $.each(data, function(k, data1) {
+
+                var type1 = typeof data1;
+
+                if (type1 == "object") {
+
+                    flag = false;
+                    processJSON(data1);
+                    arr.push("end");
+                    arr.push("end");
+
+                } else {
+                    arr.push(k, data1);
+                }
+
+            });
+
+            return arr;
+        }
+
+        function jsonToyaml() {
+
+            var content = editor1.getValue();
+
+            if (content.trim().length == 0) {
+                return false;
+            }
+
+            try {
+                var jsonStr = editor1.getValue();
+                var yaml = json2yaml(jsonStr);
+                editor2.setOption("mode", 'text/x-q');
+                editor2.getDoc().setValue(yaml);
+            } catch (e) {
+                $("#warning").html("<div class=\"alert alert-danger\">JSON 数据错误："+e+"</div>").show().delay(5000).fadeOut();
+            }
+            last_action = "jsonToyaml";
+        }
+
+        var spacing = " ";
+        function json2yaml(obj) {
+
+            if (typeof obj == 'string') {
+                obj = JSON.parse(obj);
+            }
+
+
+            var ret = [];
+            console.log(typeof obj);
+            convert(obj, ret);
+            return ret.join("\n");
+        };
+
+
+        function getType(obj) {
+            var type = typeof obj;
+
+            if (obj instanceof Array) {
+                return 'array';
+            } else if (type == 'string') {
+                return 'string';
+            } else if (type == 'boolean') {
+                return 'boolean';
+            } else if (type == 'number') {
+                return 'number';
+            } else if (type == 'undefined' || obj === null) {
+                return 'null';
+            } else {
+                return 'hash';
+            }
+        }
+
+        function convert(obj, ret) {
+            var type = getType(obj);
+
+            switch(type) {
+                case 'array':
+                    convertArray(obj, ret);
+                    break;
+                case 'hash':
+                    convertHash(obj, ret);
+                    break;
+                case 'string':
+                    convertString(obj, ret);
+                    break;
+                case 'null':
+                    ret.push('null');
+                    break;
+                case 'number':
+                    ret.push(obj.toString());
+                    break;
+                case 'boolean':
+                    ret.push(obj ? 'true' : 'false');
+                    break;
+            }
+        }
+        function convertArray(obj, ret) {
+            for (var i=0; i<obj.length; i++) {
+                var ele = obj[i];
+                var recurse = [];
+                convert(ele, recurse);
+
+                for (var j=0; j<recurse.length; j++) {
+                    ret.push((j == 0 ? "- \n   " : spacing) + recurse[j]);
+                }
+            }
+        }
+
+        function convertHash(obj, ret) {
+            for (var k in obj) {
+                var recurse = [];
+                if (obj.hasOwnProperty(k)) {
+                    var ele = obj[k];
+                    convert(ele, recurse);
+                    var type = getType(ele);
+                    if (type == 'string' || type == 'null' || type == 'number' || type == 'boolean') {
+                        ret.push(normalizeString(k) + ': ' + recurse[0]);
+                    } else {
+                        ret.push(normalizeString(k) + ': ');
+                        for (var i=0; i<recurse.length; i++) {
+                            ret.push(spacing + recurse[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        function normalizeString(str) {
+            if (str.match(/^[\w]+$/)) {
+                return str;
+            } else {
+                return JSON.stringify(str);
+            }
+        }
+
+        function convertString(obj, ret) {
+            ret.push(normalizeString(obj));
+        }
+        new ClipboardJS('#copycode', {
+            text: function(trigger) {
+                return editor2.getDoc().getValue();
+            }
+        }).on('success', function(e) {
+            $("#copycode").text('已复制');
+            selectAll();
+            setTimeout(function() {
+                $("#copycode").html('<i class="fa fa-copy"></i> 复制代码')
+            }, 2000);
+            e.clearSelection();
+        }).on('error', function(e) {
+            alert('Error!');
+        });
+
+        new ClipboardJS('#copyBookmarkCode', {
+            text: function(trigger) {
+                $("#submitBTN").click();
+                let bookMarkCode = "javascript:(function(){"+editor2.getDoc().getValue()+"})();";
+                editor2.getDoc().setValue(bookMarkCode);
+                return bookMarkCode;
+            }
+        }).on('success', function(e) {
+            $("#copyBookmarkCode").text('已复制');
+            selectAll();
+            setTimeout(function() {
+                $("#copyBookmarkCode").html('<i class="fa fa-copy"></i> 生成书签JS到剪切板')
+            }, 2000);
+            e.clearSelection();
+        }).on('error', function(e) {
+            alert('Error!');
+        });
+        function selectAll() {
+            if (editor2) {
+                editor2.execCommand('selectAll');
+            }
+        }
+
+        function clearAll() {
+            if (editor1 && editor2) {
+                editor1.setValue('');
+                editor2.setValue('');
+            }
+        }
+
+        function changeToFileContent(input) {
+            var file = input.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.readAsText(file, "UTF-8");
+                reader.onload = function(event) {
+                    if (editor1) {
+                        editor1.setValue(event.target.result);
+                    }
+                };
+            }
+        }
+    </script>
+
+
+
+
+
+</div>
+
+<div class="row " style="margin: 20px 10px;">
+
+
+    <div class="col-md-12 ">
+
+        <div class="text-center mt-3 shadow">
+
+            <!-- 移动版 自动调整 -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-5751451760833794"
+                 data-ad-slot="1691338467"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!--<script src="https://cdn.staticfile.org/bootstrap/4.6.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>-->
+<script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+
+
+    $(function() {
+        //代码高亮
+        $('pre').each(function() {
+            if(!$(this).hasClass("prettyprint")) {
+                $(this).addClass("prettyprint");
+            }
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        if(is_home) {
+            $(window).scroll(function () {
+                var _stop = $(window).scrollTop();
+                if(_stop>=100) {
+                    $("#go-top").fadeIn();
+
+                }else {
+                    $("#go-top").fadeOut();
+                }
+            });
+            _current_hash = window.location.hash;
+            console.log(_current_hash);
+            if(_current_hash) {
+
+                var $targetEle = $(_current_hash);
+                var sTop =  $targetEle.offset().top;
+                $('html, body').stop().animate({
+                    'scrollTop':sTop-100
+                }, 300, 'swing', function (e) {
+                    // window.location.hash = targetEle;
+                });
+                console.log(sTop);
+                return false;
+
+            }
+            $("#go-top").click(function(event){
+                $('html,body').animate({scrollTop:0}, 100);
+                return false;
+            });
+            // 导航
+            var _html_nav='<a class="nav-link active" href="javascript:void();"><i class="fa fa-compass" aria-hidden="true"></i> 快速导航</a>';
+            var _html_right_nav = '<button class="dropdown-item" href="#"><i class="fa fa-th-list" aria-hidden="true"></i> 快速导航</button><div class="dropdown-divider"></div>';
+            var _html_left_nav = '<dt><span class="show-list"></span></dt>';
+            for (var i=0;i<data_hrefs.length;i++)
+            {
+                id="runoob-goto-" + data_hrefs[i];
+                _html_nav += '<a class="nav-link" href="#'+id+'">'+$("#"+id).data("text")+'</a>';
+                _html_right_nav +='<button class="dropdown-item" onclick="location.href=\'#'+id+'\'" type="button"><i class="fa fa-caret-right" aria-hidden="true"></i> '+$("#"+id).data("text")+'</button>' ;
+                _html_left_nav +='<dd><a href="#'+id+'" class="auto-scroll" data-offset="98" data-speed="500">'+$("#"+id).data("text")+'</a></dd>';
+            }
+            $(".nav-underline").html(_html_nav);
+            $("#right_nav_list").html(_html_right_nav);
+            $("#goto").html(_html_left_nav);
+            if($(".nav-scroller").is(":visible")){
+                $('a[href^="#"]').on('click', function (e) {
+                    e.preventDefault();
+                    $(this).addClass('nav-underline-active');
+                    $(this).siblings().removeClass('nav-underline-active');
+                    var targetEle = this.hash;
+                    var $targetEle = $(targetEle);
+                    var sTop =  $targetEle.offset().top;
+                    $('html, body').stop().animate({
+                        'scrollTop':sTop-100
+                    }, 300, 'swing', function () {
+                        //   window.location.hash = targetEle;
+                    });
+                });
+            } else {
+                $('a[href^="#"]').on('click', function (e) {
+                    e.preventDefault();
+                    var targetEle = this.hash;
+                    var $targetEle = $(targetEle);
+                    var sTop =  $targetEle.offset().top;
+                    $('html, body').stop().animate({
+                        'scrollTop':sTop-56
+                    }, 300, 'swing', function () {
+                        //   window.location.hash = targetEle;
+                    });
+                });
+            }
+        } else {
+            $("#top").hide();
+        }
+
+
+        // search
+        if($('#search-name').length){
+            var _href=  $("#search-name .nav-underline-active").attr("href");
+        }
+
+        $('#search-name li a').each(function(){
+            $(this).on("click", function(e){
+                e.preventDefault();
+                _href = $(this).attr('href');
+                $(this).removeClass("text-muted").addClass("nav-underline-active");
+                $(this).parent().siblings().find("a").addClass("text-muted").removeClass("nav-underline-active");
+                //  console.log(_href);
+            });
+
+        })
+
+        $('#search-button').on("click", function(e){
+            // console.log(_href);
+            _hmt.push(['_trackEvent', 'Search', 'Click', '搜索工具']);
+            keyword = $(".search").find("input:text").val();
+            window.open(_href + keyword, '_blank');
+        });
+        $(".search").find("input:text").keypress(function (e) {
+            var key = e.which;
+            if(key == 13)  // the enter key code
+            {
+                window.open(_href + $(this).val(), '_blank');
+                return false;
+            }
+        });
+    });
+
+    (function($){
+        var p=$('.runoob-item-index');
+        if(p.length<1) return;
+        var arr=[];
+        function part_offset_top() {
+            p.each(function () {
+                var of=$(this).offset();
+                arr.push(Math.floor(of.top));
+            });
+        }
+        function goto_current(index) {
+            var a=$('#goto dd');
+            var b=$('#goto dt');
+            if(a.length<1) return;
+            var h=a.outerHeight();
+            if (!a.eq(index).hasClass('current')) {
+                a.removeClass('current');
+                a.eq(index).addClass('current');
+                // console.log(index)
+                b.animate({
+                    'top': h*index+(a.outerHeight()-b.outerHeight())/2+1
+                },50);
+            }
+        }
+        function window_scroll() {
+            var st=window.pageYOffset
+                || document.documentElement.scrollTop
+                || document.body.scrollTop
+                || 0;
+            var limit=Math.ceil(st+98);
+            var index=0;
+            for (var i = 0; i < arr.length; i++) {
+                if (limit>=arr[i]) {
+                    index=i;
+                }else{
+                    break;
+                }
+            }
+            if (index<0) index=0;
+            if (!p.eq(index).hasClass('current')) {
+                p.removeClass('current');
+                p.eq(index).addClass('current');
+                goto_current(index);
+            }
+        }
+        part_offset_top();
+        setTimeout(window_scroll,0);
+        $(window).on('scroll',window_scroll);
+    })(jQuery);
+    /* --侧边栏滚动时固定-- */
+    (function($){
+        var s=$('.sidebar');
+
+        if(s.length<1) return;
+        var c=s.children('.content-sidebar');
+        if(c.length<1) return;
+        var $parent=s.parent();
+        if($parent.length<1) return;
+        var start=0,stop=0,cHeight=0;
+        function init() {
+            var soffset=s.offset();
+            start=soffset.top;
+            stop=start+$parent.height();
+            cinit();
+        }
+        function cinit() {
+            cHeight=c.height();
+        }
+        function cClear(){
+            c.removeClass('fixed');
+            c.removeClass('absolute');
+        }
+        function check_scroll(){
+            var st=window.pageYOffset
+                || document.documentElement.scrollTop
+                || document.body.scrollTop
+                || 0;
+            if (st<=start) {
+                cClear();
+            }
+            if (st>=stop-cHeight) {
+                c.removeClass('fixed');
+                c.addClass('absolute');
+                return;
+            }
+            if (st<stop-cHeight && st>start) {
+                c.removeClass('absolute');
+                c.addClass('fixed');
+            }
+        }
+
+        init();
+        check_scroll();
+        $(window).on('resize',init);
+        $(window).on('scroll',check_scroll);
+    })(jQuery);
+
+    // (function () {
+    //     'use strict'
+    //
+    //     document.querySelector('#navbarSideCollapse').addEventListener('click', function () {
+    //         document.querySelector('.offcanvas-collapse').classList.toggle('open')
+    //     })
+    // })()
+</script>
+<div style="display:none;">
+    <script>
+        var _hmt = _hmt || [];
+        // (function() {
+        //     var hm = document.createElement("script");
+        //     hm.src = "https://hm.baidu.com/hm.js?68c6d4f0f6c20c5974b17198fa6fd40a";
+        //     var s = document.getElementsByTagName("script")[0];
+        //     s.parentNode.insertBefore(hm, s);
+        // })();
+    </script>
+</div>
+
+
+<div class="modal fade" id="tg-1" tabindex="-1" role="dialog" aria-labelledby="tg-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold text-danger"><i class="fas fa-comments-dollar"></i> 支付宝红包</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+<!--                    <img src="https://static.runoob.com/images/mix/zfb09-22.jpg" class="img-fluid" >-->
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
