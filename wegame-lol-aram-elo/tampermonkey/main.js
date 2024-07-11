@@ -1,12 +1,15 @@
 // ==UserScript==
-// @name         wegame-lol-aram-elo
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  WeGame LOL历史战绩显示大乱斗团队ELO均分
-// @author       YmdElf
-// @match        *://www.wegame.com.cn/helper/lol/v2/index.html*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        none
+// @name            wegame-lol-aram-elo
+// @namespace       https://greasyfork.org/zh-CN/users/1331729-a492219408
+// @homepageURL     https://greasyfork.org/zh-CN/scripts/500284
+// @supportURL      https://greasyfork.org/zh-CN/scripts/500284/feedback
+// @version         1.0
+// @description     WeGame LOL历史战绩显示大乱斗团队ELO均分
+// @author          YmdElf
+// @match           *://www.wegame.com.cn/helper/lol/v2/index.html*
+// @icon            data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant           none
+// @license         MIT
 // ==/UserScript==
 
 (function () {
