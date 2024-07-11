@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name            wegame-lol-aram-elo
-// @namespace       https://greasyfork.org/zh-CN/users/1331729-a492219408
+// @namespace       https://greasyfork.org/zh-CN/users/1331729
 // @homepageURL     https://greasyfork.org/zh-CN/scripts/500284
 // @supportURL      https://greasyfork.org/zh-CN/scripts/500284/feedback
 // @version         1.0
@@ -20,7 +20,6 @@
         const queryURI = '/api/v1/wegame.pallas.game.LolBattle/GetBattleDetail';
         const lolPanelVSdata = "body>div#app>div.page-history-record>div.lol-row>div.lol-row-container>div.lol-row-main>div.lol-panel.lol-panel-vsdata"
         let battleDetail = {};
-
 
         // 在指定元素中添加ELO元素
         function appendEloElement(teamDataElement, elo) {
