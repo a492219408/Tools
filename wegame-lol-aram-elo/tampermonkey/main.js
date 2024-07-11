@@ -67,7 +67,6 @@
             // 在控制台输出解析后的参数
             // console.log(hashParams);
 
-
             let payloadTemplate = {
                 "account_type": hashParams.account_type ? parseInt(hashParams.account_type, 10) : null,
                 "area": hashParams.area_id ? parseInt(hashParams.area_id, 10) : null,
@@ -75,7 +74,6 @@
                 "game_id": hashParams.gameId || "",
                 "from_src": "lol_helper"
             };
-
 
             fetch(queryURI, {
                 method: 'POST',
