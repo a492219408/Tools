@@ -167,7 +167,7 @@
                     newElement.innerHTML = `可能未登录，点击我跳转到登录界面，在新的网页中的右上角登录，然后刷新此页面<br>如果新的网页中的右上角显示已登录，那就注销再登录一次，然后刷新此页面`;
 
                     // 将新的超链接元素添加到指定的元素中
-                    noLoginElement.appendChild(newElement);
+                    historyListNoDataElement.appendChild(newElement);
                 }
                 // 选择指定的元素
                 let noLoginElement = document.querySelector("div.no-data");
